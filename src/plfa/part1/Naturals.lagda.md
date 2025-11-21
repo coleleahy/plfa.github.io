@@ -78,7 +78,7 @@ Write out `7` in longhand. The suggestion below loads but is, of course, incorre
 
 ```agda
 seven : ℕ
-seven = zero
+seven = suc ( suc ( suc ( suc ( suc ( suc ( suc zero))))))
 ```
 
 Type `C-c C-l` in Emacs to instruct Agda to re-load.
@@ -438,7 +438,23 @@ other word for evidence, which we will use interchangeably, is _proof_.
 Compute `3 + 4`, writing out your reasoning as a chain of equations, using the equations for `+`.
 
 ```agda
--- Your code goes here
+_ : 3 + 4 ≡ 7
+_ =
+  begin
+    3 + 4
+  ≡⟨⟩
+    suc (2 + 4)
+  ≡⟨⟩
+    suc (suc (1 + 4))
+  ≡⟨⟩
+    suc (suc (suc (0 + 4)))
+  ≡⟨⟩
+    suc (suc (suc (4)))
+  ≡⟨⟩
+    suc (suc (suc (suc (suc (suc (suc 0))))))
+  ≡⟨⟩
+    7
+  ∎
 ```
 
 
@@ -500,7 +516,20 @@ Compute `3 * 4`, writing out your reasoning as a chain of equations, using the e
 (You do not need to step through the evaluation of `+`.)
 
 ```agda
--- Your code goes here
+_ =
+  begin
+    3 * 4
+  ≡⟨⟩
+    4 + (2 * 4)
+  ≡⟨⟩
+    4 + 4 + (1 * 4)
+  ≡⟨⟩
+    4 + 4 + 4 + (0 * 4)
+  ≡⟨⟩
+    4 + 4 + 4 + 0
+  ≡⟨⟩
+    12
+  ∎
 ```
 
 
@@ -514,7 +543,16 @@ Define exponentiation, which is given by the following equations:
 Check that `3 ^ 4` is `81`.
 
 ```agda
--- Your code goes here
+_^_ : ℕ → ℕ → ℕ
+n ^ zero    = suc zero
+n ^ (suc m) = n * (n ^ m)
+
+_ =
+  begin
+    3 ^ 4
+  ≡⟨⟩
+    81
+  ∎
 ```
 
 
@@ -597,7 +635,31 @@ Section [Logical Connectives](/Decidable/#logical-connectives).
 Compute `5 ∸ 3` and `3 ∸ 5`, writing out your reasoning as a chain of equations.
 
 ```agda
--- Your code goes here
+_ =
+  begin
+    5 ∸ 3
+  ≡⟨⟩
+    4 ∸ 2
+  ≡⟨⟩
+    3 ∸ 1
+  ≡⟨⟩
+    2 ∸ 0
+  ≡⟨⟩
+    2
+  ∎
+
+_ =
+  begin
+    3 ∸ 5
+  ≡⟨⟩
+    2 ∸ 4
+  ≡⟨⟩
+    1 ∸ 3
+  ≡⟨⟩
+    0 ∸ 2
+  ≡⟨⟩
+    0
+  ∎
 ```
 
 
@@ -792,6 +854,13 @@ Begin by typing:
     _+_ : ℕ → ℕ → ℕ
     m + n = ?
 
+
+```agda
+-- _++_ : ℕ → ℕ → ℕ
+-- zero ++ n = n
+-- suc m ++ n = suc (m ++ n)
+```
+
 The question mark indicates that you would like Agda to help with
 filling in that part of the code. If you type `C-c C-l` (pressing
 the control key while hitting the `c` key followed by the `l` key),
@@ -932,7 +1001,7 @@ Define a function
 that converts a bitstring to the bitstring for the next higher
 number.  For example, since `1100` encodes twelve, we should have:
 
-    inc (⟨⟩ I O I I) ≡ ⟨⟩ I I O O
+    inc (⟨⟩ I O I I) ≡ ⟨⟩ I I O O´
 
 Confirm that this gives the correct answer for the bitstrings
 encoding zero through four.
@@ -948,7 +1017,81 @@ represents a positive natural, and represent zero by `⟨⟩ O`.
 Confirm that these both give the correct answer for zero through four.
 
 ```agda
--- Your code goes here
+inc : Bin → Bin
+inc ⟨⟩ = ⟨⟩ I
+inc (b O) = b I
+inc (b I) = inc b O
+
+to : ℕ → Bin
+to zero = ⟨⟩ O
+to (suc n) = inc (to n)
+
+from : Bin → ℕ
+from ⟨⟩ = 0
+from (b O) = (from b) * 2
+from (b I) = (from b) * 2 + 1
+
+-- Successor of 0 is 1
+_ : inc (⟨⟩ O) ≡ ⟨⟩ I
+_ =
+  begin
+    inc (⟨⟩ O)
+  ≡⟨⟩
+    ⟨⟩ I
+  ∎
+
+-- Successor of 0 is 1 (variant representations)
+_ : inc (⟨⟩ O O O) ≡ ⟨⟩ O O I
+_ =
+  begin
+    inc (⟨⟩ O O O)
+  ≡⟨⟩
+    ⟨⟩ O O I
+  ∎
+
+-- Successor of 11 is 12
+_ : inc (⟨⟩ I O I I) ≡ ⟨⟩ I I O O
+_ =
+  begin
+    inc (⟨⟩ I O I I)
+  ≡⟨⟩
+    ⟨⟩ I I O O
+  ∎
+
+-- Successor of 11 is 12
+_ : from (inc (⟨⟩ I O I I)) ≡ 12
+_ =
+  begin
+    from (inc (⟨⟩ I O I I))
+  ≡⟨⟩
+    12
+  ∎
+
+-- 13 is successor of successor of 11
+_ : to 13 ≡ inc (inc (⟨⟩ I O I I))
+_ =
+  begin
+    to 13
+  ≡⟨⟩
+    inc (inc (⟨⟩ I O I I))
+  ∎
+
+-- 42 is 42
+_ : from (to 42) ≡ 42
+_ =
+  begin
+    from (to 42)
+  ≡⟨⟩
+    42
+  ∎
+
+_ : 1 ≡ 1
+_ =
+  begin
+    1
+  ≡⟨⟩
+    1
+  ∎
 ```
 
 
