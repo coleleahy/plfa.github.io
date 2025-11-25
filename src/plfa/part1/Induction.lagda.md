@@ -75,10 +75,29 @@ Give another example of a pair of operators that have an identity
 and are associative, commutative, and distribute over one another.
 (You do not have to prove these properties.)
 
+-----------------------------------
+0 max n ≡ n
+n max 0 ≡ n
+
+(m max n) max p ≡ m max (n max p)
+
+m max n ≡ n max n
+
+m * (p max q) ≡ (m * p) max (m * q)
+-----------------------------------
+
 Give an example of an operator that has an identity and is
 associative but is not commutative.
 (You do not have to prove these properties.)
 
+-----------------------------------
+f ∘ identity ≡ f
+identity ∘ f ≡ f
+
+f ∘ (g ∘ h) = (f ∘ g) ∘ h
+
+f ∘ g ≡! g ∘ f
+-----------------------------------
 
 ## Associativity
 
@@ -717,9 +736,40 @@ Write out what is known about associativity of addition on each of the
 first four days using a finite story of creation, as
 [earlier](/Naturals/#finite-creation).
 
-```agda
--- Your code goes here
-```
+    -- In the beginning, there are no natural numbers, and we know nothing about
+    -- addition.
+
+    -- On the first day, we know zero.
+    0 : ℕ
+
+    -- On the second day, we know one, all sums that yield zero, and all instances of
+    -- associativity for sums that yield zero.
+    0 : ℕ
+    1 : ℕ    0 + 0 = 0    (0 + 0) + 0 ≡ 0 + (0 + 0)
+
+    -- On the third day, we know two, all sums that yield one, and all instances of
+    -- associativity that yield one.
+    0 : ℕ
+    1 : ℕ    0 + 0 = 0    (0 + 0) + 0 ≡ 0 + (0 + 0)
+    2 : ℕ    0 + 1 = 1    (0 + 1) + 0 ≡ 0 + (1 + 0)
+             1 + 0 = 1    (1 + 0) + 0 ≡ 1 + (0 + 0)
+
+    -- On the fourth day, we know three, all sums that yield two, and all instances of
+    -- associativity that yield two.
+    0 : ℕ
+    1 : ℕ    0 + 0 = 0    (0 + 0) + 0 ≡ 0 + (0 + 0)
+    2 : ℕ    0 + 1 = 1    (0 + 1) + 0 ≡ 0 + (1 + 0)
+             1 + 0 = 1    (1 + 0) + 0 ≡ 1 + (0 + 0)
+    3 : ℕ    1 + 1 = 2    (1 + 1) + 0 ≡ 1 + (1 + 0)
+                          (0 + 1) + 1 ≡ 0 + (1 + 1)
+                          (1 + 0) + 1 ≡ 1 + (0 + 1)
+             0 + 2 = 2    (0 + 2) + 0 ≡ 0 + (2 + 0)
+             2 + 0 = 2    (2 + 0) + 0 ≡ 2 + (0 + 0)
+
+On the _n_'th day there will be _n_ distinct natural numbers,
+_n × (n-1) / 2_ equations about addition, and _???_ distinct instances
+of associativity.  The number _n_ and all equations and instances of
+associativity for addition of numbers less than _n_ first appear by day _n+1_.
 
 ## Associativity with rewrite
 
@@ -890,7 +940,12 @@ just apply the previous results which show addition
 is associative and commutative.
 
 ```agda
--- Your code goes here
++-swap : ∀ (m n p : ℕ) → m + (n + p) ≡ n + (m + p)
++-swap m n p rewrite
+  +-comm m (n + p) |
+  +-assoc n p m |
+  +-comm p m
+  = refl
 ```
 
 
@@ -903,7 +958,12 @@ Show multiplication distributes over addition, that is,
 for all naturals `m`, `n`, and `p`.
 
 ```agda
--- Your code goes here
+*-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
+*-distrib-+ zero n p = refl
+*-distrib-+ (suc m) n p rewrite
+  *-distrib-+ m n p |
+  +-assoc p (m * p) (n * p)
+  = refl
 ```
 
 
@@ -916,7 +976,13 @@ Show multiplication is associative, that is,
 for all naturals `m`, `n`, and `p`.
 
 ```agda
--- Your code goes here
+*-assoc : ∀ (m n p : ℕ) -> (m * n) * p ≡ m * (n * p)
+*-assoc zero n p = refl
+*-assoc (suc m) n p rewrite
+  +-assoc m n p |
+  *-distrib-+ n (m * n) p |
+  *-assoc m n p
+  = refl
 ```
 
 
@@ -930,7 +996,25 @@ for all naturals `m` and `n`.  As with commutativity of addition,
 you will need to formulate and prove suitable lemmas.
 
 ```agda
--- Your code goes here
+*-identity-r : ∀ (m : ℕ) -> m * zero ≡ zero
+*-identity-r zero = refl
+*-identity-r (suc m) rewrite *-identity-r m = refl
+
+*-suc : ∀ (m n : ℕ) → m * suc n ≡ m + m * n
+*-suc zero n = refl
+*-suc (suc m) n rewrite
+  *-suc m n |
+  sym (+-assoc n m (m * n)) |
+  sym (+-assoc m n (m * n)) |
+  +-comm n m
+  = refl
+
+*-comm : ∀ (m n : ℕ) -> m * n ≡ n * m
+*-comm m zero rewrite *-identity-r m = refl
+*-comm m (suc n) rewrite
+  *-suc m n |
+  *-comm m n
+  = refl
 ```
 
 
