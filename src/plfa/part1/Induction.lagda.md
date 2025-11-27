@@ -1027,7 +1027,9 @@ Show
 for all naturals `n`. Did your proof require induction?
 
 ```agda
--- Your code goes here
+∸-identityˡ : ∀ (n : ℕ) → zero ∸ n ≡ zero
+∸-identityˡ zero = refl
+∸-identityˡ (suc n) = refl
 ```
 
 
@@ -1040,7 +1042,14 @@ Show that monus associates with addition, that is,
 for all naturals `m`, `n`, and `p`.
 
 ```agda
--- Your code goes here
+∸-+-assoc : ∀ (m n p : ℕ) → m ∸ n ∸ p ≡ m ∸ (n + p)
+∸-+-assoc zero n p rewrite
+  ∸-identityˡ n |
+  ∸-identityˡ p |
+  ∸-identityˡ (n + p)
+  = refl
+∸-+-assoc (suc m) zero p = refl
+∸-+-assoc (suc m) (suc n) p rewrite ∸-+-assoc m n p = refl
 ```
 
 
