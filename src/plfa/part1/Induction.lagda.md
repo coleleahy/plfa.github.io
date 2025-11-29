@@ -1063,8 +1063,32 @@ Show the following three laws
 
 for all `m`, `n`, and `p`.
 
-```
--- Your code goes here
+
+```agda
+^-distribˡ-+-* : ∀ (m n p : ℕ) → m ^ (n + p) ≡ (m ^ n) * (m ^ p)
+^-distribˡ-+-* m zero p rewrite +-identityʳ (m ^ p) = refl
+^-distribˡ-+-* m (suc n) p rewrite
+  ^-distribˡ-+-* m n p |
+  *-assoc m (m ^ n) (m ^ p) = refl
+
+^-distribʳ-* : ∀ (m n p : ℕ) → (m * n) ^ p ≡ (m ^ p) * (n ^ p)
+^-distribʳ-* m n zero = refl
+^-distribʳ-* m n (suc p) rewrite
+  ^-distribʳ-* m n p |
+  *-assoc m (m ^ p) (n * n ^ p) |
+  sym (*-assoc (m ^ p) n (n ^ p)) |
+  *-comm (m ^ p) n |
+  *-assoc n (m ^ p) (n ^ p) |
+  sym (*-assoc m n (m ^ p * n ^ p))
+  = refl
+
+^-*-assoc : ∀ (m n p : ℕ) → (m ^ n) ^ p ≡ m ^ (n * p)
+^-*-assoc m n zero rewrite *-identity-r n = refl
+^-*-assoc m n (suc p) rewrite
+  *-suc n p |
+  ^-distribˡ-+-* m n (n * p) |
+  ^-*-assoc m n p
+  = refl
 ```
 
 
@@ -1089,7 +1113,49 @@ over bitstrings:
 For each law: if it holds, prove; if not, give a counterexample.
 
 ```agda
--- Your code goes here
+data Bin : Set where
+  ⟨⟩ : Bin
+  _O : Bin → Bin
+  _I : Bin → Bin
+
+inc : Bin → Bin
+inc ⟨⟩ = ⟨⟩ I
+inc (b O) = b I
+inc (b I) = inc b O
+
+to : ℕ → Bin
+to zero = ⟨⟩ O
+to (suc n) = inc (to n)
+
+from : Bin → ℕ
+from ⟨⟩ = 0
+from (b O) = (from b) * 2
+from (b I) = (from b) * 2 + 1
+
+from-suc : ∀ (b : Bin) → from (inc b) ≡ suc (from b)
+from-suc ⟨⟩ = refl
+from-suc (b O) rewrite
+  +-suc (from b * 2) 0 |
+  +-identityʳ (from b * 2)
+  = refl
+from-suc (b I) rewrite
+  from-suc b |
+  +-suc (from b * 2) 0 |
+  +-identityʳ (from b * 2)
+  = refl
+
+-- Counterexamples to to-from : ∀ (b : Bin) → to (from b) ≡ b
+_ : to (from ⟨⟩) ≡ ⟨⟩ O
+_ = refl
+_ : to (from (⟨⟩ O O I)) ≡ ⟨⟩ I
+_ = refl
+
+from-to : ∀ (n : ℕ) → from (to n) ≡ n
+from-to zero = refl
+from-to (suc n) rewrite
+  from-suc (to n) |
+  from-to n
+  = refl
 ```
 
 
