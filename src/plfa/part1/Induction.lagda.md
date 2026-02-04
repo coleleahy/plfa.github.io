@@ -829,6 +829,7 @@ chains of equations:
 +-comm′ m zero rewrite +-identity′ m = refl
 +-comm′ m (suc n) rewrite +-suc′ m n | +-comm′ m n = refl
 ```
+
 In the final line, rewriting with two equations is
 indicated by separating the two proofs of the relevant equations by a
 vertical bar; the rewrite on the left is performed before that on the
@@ -947,7 +948,6 @@ is associative and commutative.
   +-comm p m
   = refl
 ```
-
 
 #### Exercise `*-distrib-+` (recommended) {#times-distrib-plus}
 

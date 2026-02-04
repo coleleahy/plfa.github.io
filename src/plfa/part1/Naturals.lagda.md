@@ -553,6 +553,9 @@ _ =
   ≡⟨⟩
     81
   ∎
+
+_ : 3 ^ 4 ≡ 81
+_ = refl
 ```
 
 
@@ -1001,7 +1004,7 @@ Define a function
 that converts a bitstring to the bitstring for the next higher
 number.  For example, since `1100` encodes twelve, we should have:
 
-    inc (⟨⟩ I O I I) ≡ ⟨⟩ I I O O´
+    inc (⟨⟩ I O I I) ≡ ⟨⟩ I I O O
 
 Confirm that this gives the correct answer for the bitstrings
 encoding zero through four.
